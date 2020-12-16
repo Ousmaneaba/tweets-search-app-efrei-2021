@@ -1,0 +1,9 @@
+pandas
+numpy
+re
+nltk
+gensim
+tqdm
+bs4
+sklearn
+scikit-learn
