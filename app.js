@@ -47,7 +47,7 @@ app.get('/tweets', (req, res) => {
 		    console.log("AN ERROR OCCURED")
 		    console.log(err)
 		    res.send(500)
-		  })$
+		  })
 
 	}
 
