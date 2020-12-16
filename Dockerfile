@@ -14,7 +14,7 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Exposing server port
-EXPOSE 8080
+EXPOSE 8111
 
 # Running server
 CMD [ "node", "server.js" ]

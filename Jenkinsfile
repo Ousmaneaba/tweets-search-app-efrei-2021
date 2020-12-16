@@ -2,12 +2,62 @@ pipeline{
   agent any
   parameters {
     string(name: 'WAS_RELEASED', defaultValue: '0')
+    string(name: 'HAS_TEST_FAILED', defaultValue: '1')
   }
   stages{
-    stage('Create release branch'){
+    stage('Build app'){
       steps {
         script{
           if(env.BRANCH_NAME == 'develop'){
+            echo "Building app..."
+            sh 'docker-compose up -d'
+          }
+          else{
+            echo "Build app skipped"
+          }
+        }
+      }
+    }
+    stage('Run tests'){
+      steps {
+        script{
+          if(env.BRANCH_NAME == 'develop'){
+            echo "Running test..."
+            sh 'npm install'
+            sh 'npm test &> tmp_test'
+            FAILED_OUTPUT = sh( script: "grep -oi failed tmp | head -1", returnStdout: true)
+            
+            if(FAILED_OUTPUT != "failed"){
+              env.HAS_TEST_FAILED = '0'
+            }
+            else{
+              echo "TESTS FAILED !"
+            }
+            sh 'rm tmp_test'
+          }
+          else{
+            echo "Run tests skipped"
+          }
+        }
+      }
+    }
+    stage('Docker images down'){
+      steps {
+        script{
+          if(env.BRANCH_NAME == 'develop'){
+            echo "Downing docker images"
+            sh 'docker-compose down'
+          }
+          else{
+            echo "Docker images down skipped"
+          }
+        }
+      }
+    }
+    stage('Create release branch'){
+      steps {
+        script{
+          if(env.BRANCH_NAME == 'develop' && env.WAS_RELEASED != '1'){
             echo "Creating branch..."
             sh "git checkout -b release_${env.BUILD_NUMBER}"
             sh "touch release_versions_infos/release_${env.BUILD_NUMBER}"
