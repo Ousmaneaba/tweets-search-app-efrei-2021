@@ -2,7 +2,4 @@ pandas
 numpy
 nltk
 gensim
-tqdm
-bs4
 sklearn
-scikit-learn
