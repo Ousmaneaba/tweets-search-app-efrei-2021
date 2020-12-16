@@ -14,7 +14,7 @@ pipeline{
             sh "git add ."
             sh "git commit -m \"release_${env.BUILD_NUMBER}\""
             withCredentials([usernamePassword(credentialsId: env.git_cred, passwordVariable: env.git_pwd, usernameVariable: env.git_account)]) {
-              sh("git push https://${env.git_account}:${env.git_pwd}@github.com/Ousmaneaba/test")
+              sh("git push https://${env.git_account}:${env.git_pwd}@github.com/Ousmaneaba/tweets-search-app-efrei-2021")
             }
             env.WAS_RELEASED = '1'
           }
@@ -30,7 +30,7 @@ pipeline{
           if(env.WAS_RELEASED == '1'){
             echo "Merging release branch into master..."
             git(
-              url: 'https://github.com/Ousmaneaba/test',
+              url: 'https://github.com/Ousmaneaba/tweets-search-app-efrei-2021',
               credentialsId: env.git_cred,
               branch: "master"
             )
@@ -38,7 +38,7 @@ pipeline{
               sh("git merge --no-ff release_${env.BUILD_NUMBER}")
             }
             withCredentials([usernamePassword(credentialsId: env.git_cred, passwordVariable: env.git_pwd, usernameVariable: env.git_account)]) {
-              sh("git push https://${env.git_account}:${env.git_pwd}@github.com/Ousmaneaba/test")
+              sh("git push https://${env.git_account}:${env.git_pwd}@github.com/Ousmaneaba/tweets-search-app-efrei-2021")
             }
           }
           else{
