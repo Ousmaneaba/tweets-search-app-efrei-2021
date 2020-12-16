@@ -3,12 +3,17 @@ pipeline{
   parameters {
     string(name: 'WAS_RELEASED', defaultValue: '0')
     string(name: 'HAS_TEST_FAILED', defaultValue: '1')
+    string(name: 'IS_RELEASE_BRANCH', defaultValue: '')
   }
   stages{
     stage('Build app'){
       steps {
         script{
-          if(env.BRANCH_NAME == 'develop'){
+          sh "echo ${env.BRANCH_NAME} > tmp_branch"
+          env.IS_RELEASE_BRANCH = sh( script: "grep -oi release tmp_branch | head -1", returnStdout: true)
+          sh 'rm tmp_branch'
+
+          if(env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
             echo "Building app..."
             sh 'docker-compose up -d'
           }
@@ -18,10 +23,10 @@ pipeline{
         }
       }
     }
-    stage('Run tests'){
+    stage('Run unit tests'){
       steps {
         script{
-          if(env.BRANCH_NAME == 'develop'){
+          if(env.BRANCH_NAME != 'develop' && env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
             echo "Running test..."
             sh 'npm install'
             sh 'npm test &> tmp_test'
@@ -44,7 +49,7 @@ pipeline{
     stage('Docker images down'){
       steps {
         script{
-          if(env.BRANCH_NAME == 'develop'){
+          if(env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
             echo "Downing docker images"
             sh 'docker-compose down'
           }
