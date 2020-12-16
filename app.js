@@ -17,8 +17,6 @@ app.get('/', (req, res) => {
 
 app.get('/tweets', (req, res) => {
 
-    console.log(req.query.message)
-
 	if(req.query.message == undefined || req.query.message == null || req.query.message == '' ){
 		res.render('index');
 	}
@@ -44,6 +42,12 @@ app.get('/tweets', (req, res) => {
 			});
 
 		  });
+
+		  scriptProcess.on('error', (err) => {
+		    console.log("AN ERROR OCCURED")
+		    console.log(err)
+		    res.send(500)
+		  })$
 
 	}
 
