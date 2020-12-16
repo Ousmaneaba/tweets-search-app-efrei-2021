@@ -1,0 +1,22 @@
+{
+  "name": "Docker-Twitter-search-app-2021",
+  "version": "1.0.0",
+  "description": "Node.js server on Docker",
+  "author": "BA - PHILEMON",
+  "license": "UNLICENSED",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "ejs": "^3.1.5",
+    "express": "^4.16.1",
+    "jest": "^26.6.3",
+    "supertest": "^6.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Ousmaneaba/Twitter-search-app.git"
+  }
+}
