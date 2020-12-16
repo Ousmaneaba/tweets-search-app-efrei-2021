@@ -23,6 +23,7 @@ pipeline{
         script{
           if(env.BRANCH_NAME == 'develop'){
             echo "Running test..."
+            sh 'npm install'
             sh 'npm test &> tmp_test'
             FAILED_OUTPUT = sh( script: "grep -oi failed tmp | head -1", returnStdout: true)
             
