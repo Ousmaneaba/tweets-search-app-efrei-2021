@@ -7,7 +7,7 @@ import argparse
 
 import pandas as pd
 import numpy as np
-import re
+import sys
 
 import nltk
 from nltk.stem import PorterStemmer
@@ -32,8 +32,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 # In[3]:
 # Define the parser
 parser = argparse.ArgumentParser(description='Short sample app')
-parser.add_argument('--search', action="store", dest='algo', default=0)
-args = parser.parse_args()
+args = sys.argv[1]
+
 
 
 file_name="prepdata.pkl"
@@ -69,6 +69,8 @@ def getres(recherche):
         
         cosine_similarities = np.delete(cosine_similarities, best_match_index)
         resultat.append(preprocessed_data.loc[best_match_index,"text"])
+
+
     
     return resultat
 
@@ -76,7 +78,9 @@ def getres(recherche):
 # In[8]:
 
 
-res = getres(args.algo)
+res = getres(args)
+with open(sys.argv[2], 'w') as fd:
+			fd.write(str(res))
 print(res)
 
 
