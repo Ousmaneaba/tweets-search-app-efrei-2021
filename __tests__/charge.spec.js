@@ -1,34 +1,33 @@
 const config = require("../config.js");
 const supertest = require('supertest');
 const app = require("../app.js");
-const request = supertest(app);
 
-describe("charge", () => {
-    test("should handle 1000 request per minute", async () => {
+describe("charge test", () => {
 
-        let hasError = false;
+    for(let i = 0; i < 1000; i++){
 
-        /*let i = 0;
+        let div = Math.trunc(i/17);
 
-        for(i = 0; i<1000; i++){
-            let isHtml = false;
+        if((i%17) == 0){
+
+            setTimeout(()=>{}, 1000 * div);
+        }
+
+        it('attempt ' + i + ' ( slept for ' + div + "s )", async () => {
+
+            let hasError = true;
     
-                await isServerReturningHtmlPage()
-                .then(function(result){
-                });
-        } */
-    
-        expect(hasError).toEqual(false);
-    });
+            await supertest(app).get('/tweets?message=trump')
+            .then(function(result){
+                if(result.headers['content-type'].includes("text/html")){
+                hasError = false;
+                }
+            })
+          .catch(function(err){
+          });
+            
+            expect(hasError).toEqual(false);
+        });
+    }
 
 });
-
-function f() {
-}
-
-
-async function isServerReturningHtmlPage(){
-
-    return await request.get('/');
-  
-}
