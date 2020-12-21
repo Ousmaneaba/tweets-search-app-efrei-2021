@@ -134,9 +134,8 @@ pipeline{
         script{
           if(env.BRANCH_NAME == 'master'){
             echo "Deploying app ..."
-            sh 'docker kill $(docker ps -q)'
-            sh 'docker rm $(docker ps -a -q)'
-            sh 'docker rmi $(docker images -q)'
+            sh 'docker container prune'
+            sh 'docker image prune'
             sh 'docker-compose up -d'
             sh 'ADMIN_USER=admin ADMIN_PASSWORD=admin docker-compose -f prometheus/docker-compose.yml up -d'
           }
