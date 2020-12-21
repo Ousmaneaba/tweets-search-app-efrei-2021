@@ -3,19 +3,25 @@ pipeline{
   parameters {
     string(name: 'WAS_RELEASED', defaultValue: '0')
     string(name: 'HAS_TEST_FAILED', defaultValue: '1')
-    string(name: 'IS_RELEASE_BRANCH', defaultValue: '')
+    string(name: 'IS_RELEASE_BRANCH', defaultValue: '0')
   }
   stages{
     stage('Build app'){
       steps {
         script{
           sh "echo ${env.BRANCH_NAME} > tmp_branch"
-          sh "echo ${env.BRANCH_NAME}"
-          sh "grep -oi release tmp_branch | head -1"
-          env.IS_RELEASE_BRANCH = sh( script: "grep -oi release tmp_branch | head -1", returnStdout: true)
+          RELEASE_OUTPUT = sh( script: "grep -oi release tmp_branch | head -1", returnStdout: true)
+
+          if(RELEASE_OUTPUT != "release"){
+              env.IS_RELEASE_BRANCH = '0'
+            }
+            else{
+              env.IS_RELEASE_BRANCH = '1'
+            }
+          
           sh 'rm tmp_branch'
 
-          if(env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
+          if(env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != '1'){
             echo "Building app..."
             sh 'docker-compose up -d'
           }
@@ -25,14 +31,14 @@ pipeline{
         }
       }
     }
-    stage('Run tests'){
+    stage('Run unit tests'){
       steps {
         script{
-          if(env.BRANCH_NAME == 'develop'){
-            echo "Running charge tests..."
+          if(env.BRANCH_NAME != 'develop' && env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != '1'){
+            echo "Running test..."
             sh 'npm install'
-            sh 'npm test -- charge'
-            sh 'npm test -- charge &> tmp_test'
+            sh 'npm test'
+            sh 'npm test &> tmp_test'
             FAILED_OUTPUT = sh( script: "grep -oi failed tmp | head -1", returnStdout: true)
             
             if(FAILED_OUTPUT != "failed"){
@@ -44,25 +50,7 @@ pipeline{
             sh 'rm tmp_test'
           }
           else{
-            echo "Run charge tests skipped"
-          }
-          if(env.BRANCH_NAME != 'develop' && env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
-            echo "Running unit and integration tests..."
-            sh 'npm install'
-            sh 'npm test -- all'
-            sh 'npm test -- all &> tmp_test'
-            FAILED_OUTPUT = sh( script: "grep -oi failed tmp | head -1", returnStdout: true)
-            
-            if(FAILED_OUTPUT != "failed"){
-              env.HAS_TEST_FAILED = '0'
-            }
-            else{
-              echo "TESTS FAILED !"
-            }
-            sh 'rm tmp_test'
-          }
-          else{
-            echo "Run unit and integration tests skipped"
+            echo "Run tests skipped"
           }
         }
       }
@@ -70,7 +58,7 @@ pipeline{
     stage('Docker images down'){
       steps {
         script{
-          if(env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
+          if(env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != '1'){
             echo "Downing docker images"
             sh 'docker-compose down'
           }
