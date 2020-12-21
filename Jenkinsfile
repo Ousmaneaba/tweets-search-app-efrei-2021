@@ -23,14 +23,14 @@ pipeline{
         }
       }
     }
-    stage('Run unit tests'){
+    stage('Run tests'){
       steps {
         script{
-          if(env.BRANCH_NAME != 'develop' && env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
-            echo "Running test..."
+          if(env.BRANCH_NAME == 'develop'){
+            echo "Running charge tests..."
             sh 'npm install'
-            sh 'npm test'
-            sh 'npm test &> tmp_test'
+            sh 'npm test -- charge'
+            sh 'npm test -- charge &> tmp_test'
             FAILED_OUTPUT = sh( script: "grep -oi failed tmp | head -1", returnStdout: true)
             
             if(FAILED_OUTPUT != "failed"){
@@ -42,7 +42,25 @@ pipeline{
             sh 'rm tmp_test'
           }
           else{
-            echo "Run tests skipped"
+            echo "Run charge tests skipped"
+          }
+          if(env.BRANCH_NAME != 'develop' && env.BRANCH_NAME != 'master' && IS_RELEASE_BRANCH != 'release'){
+            echo "Running unit and integration tests..."
+            sh 'npm install'
+            sh 'npm test -- all'
+            sh 'npm test -- all &> tmp_test'
+            FAILED_OUTPUT = sh( script: "grep -oi failed tmp | head -1", returnStdout: true)
+            
+            if(FAILED_OUTPUT != "failed"){
+              env.HAS_TEST_FAILED = '0'
+            }
+            else{
+              echo "TESTS FAILED !"
+            }
+            sh 'rm tmp_test'
+          }
+          else{
+            echo "Run unit and integration tests skipped"
           }
         }
       }
