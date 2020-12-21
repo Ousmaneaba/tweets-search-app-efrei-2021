@@ -12,10 +12,14 @@ app.use(express.static(__dirname + '/views'));
 
 
 app.get('/', (req, res) => {
+	req.setTimeout(500000);
+
 	res.render('index');
 });
 
 app.get('/tweets', (req, res) => {
+
+	req.setTimeout(500000);
 
 	if(req.query.message == undefined || req.query.message == null || req.query.message == '' ){
 		res.render('index');

@@ -10,6 +10,8 @@ pipeline{
       steps {
         script{
           sh "echo ${env.BRANCH_NAME} > tmp_branch"
+          sh "echo ${env.BRANCH_NAME}"
+          sh "grep -oi release tmp_branch | head -1"
           env.IS_RELEASE_BRANCH = sh( script: "grep -oi release tmp_branch | head -1", returnStdout: true)
           sh 'rm tmp_branch'
 
