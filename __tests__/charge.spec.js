@@ -8,7 +8,7 @@ describe("charge", () => {
 
         let hasError = false;
 
-        let i = 0;
+        /*let i = 0;
 
         for(i = 0; i<1000; i++){
             let isHtml = false;
@@ -16,7 +16,7 @@ describe("charge", () => {
                 await isServerReturningHtmlPage()
                 .then(function(result){
                 });
-        }
+        } */
     
         expect(hasError).toEqual(false);
     });

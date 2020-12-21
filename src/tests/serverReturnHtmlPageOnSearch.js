@@ -11,7 +11,6 @@ module.exports = () => {
         if(result.headers['content-type'].includes("text/html")){
           isHtml = true;
         }
-        isHtml = true;
       });
     expect(isHtml).toEqual(true);
   });
