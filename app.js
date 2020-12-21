@@ -5,10 +5,12 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 
 const app = express();
+const promBundle = require("express-prom-bundle");
 
 
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
+app.use("/((?!ref))*", promBundle({includePath: true}));
 
 
 app.get('/', (req, res) => {
