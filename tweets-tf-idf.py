@@ -52,6 +52,6 @@ def getres(recherche):
 
 # In[8]:
 res = getres(args)
-with open(sys.argv[1], 'w') as fd:
+with open(sys.argv[2], 'w') as fd:
 	fd.write(str(res))
 print(res)

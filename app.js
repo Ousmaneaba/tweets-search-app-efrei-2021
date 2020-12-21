@@ -23,31 +23,47 @@ app.get('/tweets', (req, res) => {
 	else{
 
 		let timestamp = new Date().getTime();
-		let fileName = timestamp + "_tmp.txt";
-		let scriptProcess = spawn('python', ['tweets-tf-idf.py', req.query.message, fileName]);
-		let result = "error";
+		let fileName = timestamp + "_tmp.txt";		
 
-		 scriptProcess.on('close', (code) => {
+		let fileProcess = spawn('touch', [fileName]);
 
-		  	fs.readFile(fileName, 'utf8', function (err,data) {
+		fileProcess.on('close', (code) => {
 
-		  	if(err != null){
-		  	  res.send(500)
-		  	}
-		  	else{
-		  	  result = data
-              res.render('index', {message: req.query.message, result: result});
-		  	}
+			let scriptProcess = spawn('python', ['tweets-tf-idf.py', req.query.message, fileName]);
+			let result = "error";
 
-			});
+			scriptProcess.on('close', (code) => {
 
+	
+				  fs.readFile(fileName, 'utf8', function (err,data) {
+	
+					if(err != null){
+						res.send(500)
+					}
+					else{
+						result = data
+						res.render('index', {message: req.query.message, result: result});
+					}
+	
+					spawn('rm', [fileName]);
+	
+				});
+	
+			  });
+	
+			  scriptProcess.on('error', (err) => {
+				console.log("AN ERROR OCCURED WHILE FETCHING TWEETS")
+				console.log(err)
+				res.send(500)
+			  });
+
+		});
+
+		fileProcess.on('error', (err) => {
+			console.log("AN ERROR OCCURED WHILE CREATING TMP FILE")
+			console.log(err)
+			res.send(500)
 		  });
-
-		  scriptProcess.on('error', (err) => {
-		    console.log("AN ERROR OCCURED")
-		    console.log(err)
-		    res.send(500)
-		  })
 
 	}
 
